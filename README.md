@@ -21,6 +21,6 @@ A Dump of a small own-created dataset (2-3 entites of every entity-type) was suc
 R2RML parser also provides a full mapping for the dc-vocabulary for dspace-entities item, collections and communities.
 
 Missing:  
-*Nested Objects (no)
-*Vocabulary for expressing CERIF-entities. Namespace https://www.eurocris.org/ontologies/cerif/1.6/ not available
+* Nested Objects (no)
+* Vocabulary for expressing CERIF-entities. Namespace https://www.eurocris.org/ontologies/cerif/1.6/ not available
 
