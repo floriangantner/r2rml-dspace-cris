@@ -1,6 +1,6 @@
 # r2rml-dspace-cris
 R2RML Mapping for Dspace-CRIS  
-Testet with Dspace-CRIS 5.8  
+Works with Dspace-CRIS 5.8  
 
 Can be used for RDF-ization of Dspace-CRIS content.
 
