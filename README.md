@@ -14,7 +14,7 @@ For real-world-use, every metadata-field and pointer to other entities (by autho
 * 6. Relation ResearcherPage -> DigitalObject ('bsp')
 * 7. Relation Item -> DigitalObject ('event')
 
-![Overview over Relations between dspace-entites and cris-entities and their metadata.](r2rml_dspace_cris_steps.png){:height="50%" width="50%"}
+![Overview over Relations between dspace-entites and cris-entities and their metadata.](r2rml_dspace_cris_steps.png?v=4&s=200)
 
 A Dump of a small own-created dataset (2-3 entites of every entity-type) was successfully created with the tool https://github.com/nkons/r2rml-parser/.  
 R2RML parser also provides a full mapping for the dc-vocabulary for dspace-entities item, collections and communities.
