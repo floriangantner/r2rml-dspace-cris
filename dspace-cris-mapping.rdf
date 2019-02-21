@@ -3,150 +3,18 @@
 	##by Florian Gantner
 	##Tested with Dspace-CRIS 5.8
 	##additional R2RML-Mapping for Dspace and Dspace-CRIS-Content
-	## 1. Relations between items, collection and communities
-	## 2. metadata for collection and communities
-	## 3. Metadata for Researcherpages
-	## 4. Relation Item -> Researcherpages using AuthorityValue
-	## 5. Project
-	## 6. Relation ResearcherPage -> Project
-	## 7. DigitalObject/ResearchObject 
-	## 8. Relation ResearcherPage -> DigitalObject
-	## 9. Relation Item -> DigitalObject 
-	
-#############
-	## 1. Relations between items, collection and communities
-	
-map:collection2item
-    rr:logicalTable <#collection-item-view>;
-    rr:subjectMap [
-        rr:template 'http://localhost:8080/repository/collection/{"handle_coll"}';
-    ];
-    rr:predicateObjectMap [
-      rr:predicate dc:hasPart;
-      rr:objectMap [ 
-		rr:termType  rr:IRI;
-	  rr:template 'http://localhost:8080/repository/item/{handle_item}' ];
-    ].	
-	
-<#collection-item-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle_coll, h2.handle AS handle_item
-    FROM collection2item AS c2i, handle AS h, handle AS h2 WHERE
-    c2i.collection_id=h.resource_id AND
-	c2i.item_id=h2.resource_id AND
-	h.resource_type_id=3 AND
-	h2.resource_type_id=2
-    """.
-	
-map:community2community
-    rr:logicalTable <#community-community-view>;
-    rr:subjectMap [
-        rr:template 'http://localhost:8080/repository/community/{"handle_sub"}';
-    ];
-    rr:predicateObjectMap [
-      rr:predicate dc:hasPart;
-      rr:objectMap [ 
-		rr:termType  rr:IRI;
-	  rr:template 'http://localhost:8080/repository/community/{handle_obj}' ];
-    ].	
-	
-<#community-community-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle_sub, h2.handle AS handle_obj
-    FROM community2community AS c2c, handle AS h, handle AS h2 WHERE
-    c2c.parent_comm_id=h.resource_id AND
-	c2c.child_comm_id=h2.resource_id AND
-	h.resource_type_id=4 AND
-	h2.resource_type_id=4
-    """.	
+	## 1. Metadata for Researcherpages
+	## 2. Relation Item -> Researcherpages using AuthorityValue
+	## 3. Project/OrganizationUnit
+	## 4. Relation ResearcherPage -> Project
+	## 5. DigitalObject/ResearchObject 
+	## 6. Relation ResearcherPage -> DigitalObject
+	## 7. Relation Item -> DigitalObject 
 
-map:community2collection
-    rr:logicalTable <#community-collection-view>;
-    rr:subjectMap [
-        rr:template 'http://localhost:8080/repository/community/{"handle_comm"}';
-    ];
-    rr:predicateObjectMap [
-      rr:predicate dc:hasPart;
-      rr:objectMap [
-		rr:termType  rr:IRI;
-		rr:template 'http://localhost:8080/repository/collection/{handle_coll}' ];
-    ].
-<#community-collection-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle_comm, h2.handle AS handle_coll
-    FROM community2collection AS c2c, handle AS h, handle AS h2 WHERE
-    c2c.community_id=h.resource_id AND
-	c2c.collection_id=h2.resource_id AND
-	h.resource_type_id=4 AND
-	h2.resource_type_id=3
-    """.	
-	
-#############
-	## 2. Additional Metadata for Collections and Communities
-
-<#collection-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle, c.collection_id AS id, mv.text_value AS name
-    FROM handle AS h, collection AS c, metadatavalue as mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-    h.resource_type_id=3 AND
-    h.resource_type_id=mv.resource_type_id AND
-    h.resource_id=c.collection_id AND
-    c.collection_id=mv.resource_id AND
-    msr.metadata_schema_id=mfr.metadata_schema_id AND
-    mfr.metadata_field_id=mv.metadata_field_id AND
-    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='title' AND
-    mfr.qualifier IS NULL
-    """.
-
-<#community-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle, c.collection_id AS id, mv.text_value AS name
-    FROM handle AS h, collection AS c, metadatavalue as mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-    h.resource_type_id=4 AND
-    h.resource_type_id=mv.resource_type_id AND
-    h.resource_id=c.collection_id AND
-    c.collection_id=mv.resource_id AND
-    msr.metadata_schema_id=mfr.metadata_schema_id AND
-    mfr.metadata_field_id=mv.metadata_field_id AND
-    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='title' AND
-    mfr.qualifier IS NULL
-    """.
-	
-<#collection-title-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle, c.collection_id AS id, mv.text_value AS name
-    FROM handle AS h, collection AS c, metadatavalue as mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-    h.resource_type_id=3 AND
-    h.resource_type_id=mv.resource_type_id AND
-    h.resource_id=c.collection_id AND
-    c.collection_id=mv.resource_id AND
-    msr.metadata_schema_id=mfr.metadata_schema_id AND
-    mfr.metadata_field_id=mv.metadata_field_id AND
-    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='title' AND
-    mfr.qualifier IS NULL
-    """.
-
-<#community-title-view>
-    rr:sqlQuery """
-    SELECT h.handle AS handle, c.collection_id AS id, mv.text_value AS name
-    FROM handle AS h, collection AS c, metadatavalue as mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-    h.resource_type_id=4 AND
-    h.resource_type_id=mv.resource_type_id AND
-    h.resource_id=c.collection_id AND
-    c.collection_id=mv.resource_id AND
-    msr.metadata_schema_id=mfr.metadata_schema_id AND
-    mfr.metadata_field_id=mv.metadata_field_id AND
-    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='title' AND
-    mfr.qualifier IS NULL
-    """.	
 	
 #############
 	##CRIS
- 	## 3. Metadata for Researcherpages
+ 	## 1. Metadata for Researcherpages
 	## Generating identifier based on rpage information
 	
 	<#cris-researcherpage-view>
@@ -224,24 +92,10 @@ map:cris-rp-metadata-email
         rr:objectMap [ rr:column '"value"' ];
     ].
 	
-	## Relation Item -> ResearcherPage
-	#maps item with authority-value into IRI of cris-researcher-object
-	
-map:cris-rp-metadata-author-crisid
-	rr:logicalTable <#dc-contributor-author-rp-view>;
-	rr:subjectMap [
-        rr:template 'http://localhost:8080/repository/item/{"handle"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dc:author;
-        rr:objectMap [
-		rr:termType  rr:IRI;
-		rr:template 'http://localhost:8080/cris/researcherpage/{authority}'		];
-    ].
-	
 ############
-	##4. Relation Item -> Researcherpages using AuthorityValue
+	##2. Relation Item -> Researcherpages using AuthorityValue
 	##if the authority is configured in Dspace-CRIs, the metadata also saves the crisid as the authority-value 
+	##text_value can be used to generate a literal
 	##this generates a node
 <#dc-contributor-author-rp-view>
     rr:sqlQuery """
@@ -262,10 +116,27 @@ map:cris-rp-metadata-author-crisid
 	mv.authority = rp.crisid AND 
 	rp.status = 't'
 	""".
+	
+	map:cris-rp-metadata-author-crisid
+	rr:logicalTable <#dc-contributor-author-rp-view>;
+	rr:subjectMap [
+        rr:template 'http://localhost:8080/repository/item/{"handle"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:author;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:author;
+        rr:objectMap [
+		rr:termType  rr:IRI;
+		rr:template 'http://localhost:8080/cris/researcherpage/{authority}'		];
+    ].
 
 ############	
-	##5. Project
-	##smiliar for OrganizationUnit, replace pj by ou
+	##3. Project
+	##smiliar way for OrganizationUnit, 
+	#replace pj or project by ou 
 	
 <#cris-project-view>
     rr:sqlQuery """
@@ -341,7 +212,7 @@ map:cris-pj-code
     ].
 
 ############
-	## 6. Relation ResearcherPage -> Project
+	## 4. Relation ResearcherPage -> Project
 	##as shortname the value from the RP has to be used
 	##'mainproj' is the shortname of the ResearcherPage's metadata value field pointing to the project
 
@@ -373,7 +244,7 @@ map:cris-rp-mainproj-project-relation
 	""".	
 
 ################	
-	## 7. DigitalObject/ResearchObject 
+	## 5. DigitalObject/ResearchObject 
 	## Own ResearchObject / DigitalObject (do) 
 	# do can't be used as an alias (POSTGRESQL-Expression), using dob instead
 	## Generate Identifier(s), from the do 'bsp' Entity with shortname bsp
@@ -390,12 +261,7 @@ map:cris-do-bsp
     rr:predicateObjectMap [
         rr:predicate dc:identifier;
         rr:objectMap [ rr:column '"uuid"' ];
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dc:CRISentityType;
-        rr:objectMap [ rr:template 'Bsp-Entity' ];
-    ]
-	.
+    ].
 		
 <#cris-do-bsp-view>
     rr:sqlQuery """
@@ -508,7 +374,7 @@ map:cris-bsp-journalskeywords
     ].			
 
 ################	
-	## 8. Relation ResearcherPage -> DigitalObject
+	## 6. Relation ResearcherPage -> DigitalObject
 	##CRIS Relation Researcherpage -> ResearchObject / DigitalObject / second-Level Entity
 	## here abbrevation/shortname with do 'bsp' ; ResearcherPage is using 'bsp_link' as shortname of the metadatavalue pointing at the digital object
 	
@@ -542,7 +408,7 @@ map:cris-rp-bsp-relation
 	""".	
 
 #################
-	## 9. Relation Item -> DigitalObject 
+	## 7. Relation Item -> DigitalObject 
 	## Link Dspace-Entity to CRIS-DO-Entity, e.g. to 'events' object, must be configured and defined as authority before
 	
 	#map:cris-do-metadata-author-crisid
